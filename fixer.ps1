@@ -27,6 +27,7 @@ do {
         write-host "G6 - Enable God Mode (places a shortcut on Desktop)"    
         write-host "G7 - Install fancy Sysinternals Utilities"    
         write-host "G8 - Restore old volume slider" 
+        write-host "G9 - Remove default Windows apps"
         write-host "" 
         write-host "Windows 10 fixer scripts"    
         write-host "F1 - Repair Windows Image (slow)"
@@ -48,7 +49,7 @@ do {
         
         write-host ""
         
-        $ok = @("G1","G2","G3","G4","G5","G6","G7","G8","F1","F2","F3","F4","F5","F5","F6","F7","F9","Q", "X") -contains $choice
+        $ok = @("G1","G2","G3","G4","G5","G6","G7","G8","G9","F1","F2","F3","F4","F5","F5","F6","F7","F9","Q", "X") -contains $choice
         if ( -not $ok) { write-host "Invalid selection" }
     } until ( $ok )
     
@@ -317,6 +318,53 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host ""            
             write-host "This tool is a good start to understanding powershell scripting. " 
             
+        }
+        "G9"
+        {
+            write-host "Uninstalling default apps"
+            $apps = @(
+                # default Windows 10 apps
+                "Microsoft.3DBuilder"
+                "Microsoft.Appconnector"
+                "Microsoft.BingFinance"
+                "Microsoft.BingNews"
+                "Microsoft.BingSports"
+                "Microsoft.BingWeather"
+                "Microsoft.Getstarted"
+                "Microsoft.MicrosoftOfficeHub"
+                "Microsoft.MicrosoftSolitaireCollection"
+                "Microsoft.Office.OneNote"
+                "Microsoft.People"
+                "Microsoft.SkypeApp"
+                #"Microsoft.Windows.Photos"
+                "Microsoft.WindowsAlarms"
+                #"Microsoft.WindowsCalculator"
+                "Microsoft.WindowsCamera"
+                "Microsoft.WindowsMaps"
+                "Microsoft.WindowsPhone"
+                "Microsoft.WindowsSoundRecorder"
+                #"Microsoft.WindowsStore"
+                "Microsoft.XboxApp"
+                "Microsoft.ZuneMusic"
+                "Microsoft.ZuneVideo"
+                "microsoft.windowscommunicationsapps"
+                "Microsoft.MinecraftUWP"
+            
+                # non-Microsoft
+                "9E2F88E3.Twitter"
+                "Flipboard.Flipboard"
+                "ShazamEntertainmentLtd.Shazam"
+                "king.com.CandyCrushSaga"
+                "ClearChannelRadioDigital.iHeartRadio"
+            )
+
+            foreach ($app in $apps) {
+                Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage
+            
+                Get-AppXProvisionedPackage -Online |
+                    where DisplayName -EQ $app |
+                    Remove-AppxProvisionedPackage -Online
+            }
         }
     }
 } until ( $choice -match "X" )
