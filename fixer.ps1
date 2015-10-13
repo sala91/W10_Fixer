@@ -7,26 +7,36 @@ Break
 
 do {
     do {
+
+        $os = Get-WmiObject win32_operatingsystem
+        $uptime = (Get-Date) - ($os.ConvertToDateTime($os.lastbootuptime))
+        $Display = "System uptime: " + $Uptime.Days + " days, " + $Uptime.Hours + " hours, " + $Uptime.Minutes + " minutes" 
+        $uptimeBuild = (Get-ItemProperty -Path c:\windows\system32\hal.dll).VersionInfo.FileVersion
+        $uptimeOsName = gwmi win32_operatingsystem | % caption  
         write-host ""
-        write-host "BattleIT Group LTD 2015, v0.2"
-        write-host "Windows 10 helper script + goodies"
+        write-host "BattleIT Group LTD 2015, v0.3"
+        write-host "System OS:" $uptimeOsName $uptimeBuild
+        Write-Output $Display
         write-host "" 
-        write-host "A - Explorer: show hidden files, extensions and empty drives"
-        write-host "B - Repair Windows Image (slow)"
-        write-host "C - Re-register ALL Windows Store Apps"
-        write-host "D - Reset Windows Store Cache"
-        write-host "E - Verify driver file signatures"            
-        write-host "F - Reset networking IP and flush DNS"
-        write-host "G - Gather extended log files from DISM"
-        write-host "H - Install fancy Sysinternals Utilities"
-        write-host "I - Block telemetry via Windows Firewall & Hosts file"       
-        write-host "J - Block telemetry via GPO (Enterprise only)"      
-        write-host "K - Mouse acceleration fix (100% DPI only)"
-        write-host "L - Disable StickyKeys and stuff"               
-        write-host "M - Enable God Mode (places a shortcut on Desktop)"     
-        write-host "N - Sync system time with Internet"        
-        write-host "O - Reset system services"         
-        write-host "P - Restore old volume slider"               
+        write-host "Windows 10 goodies"
+        write-host "G1 - Explorer: show hidden files, extensions and empty drives"
+        write-host "G2 - Block telemetry via Windows Firewall & Hosts file"       
+        write-host "G3 - Block telemetry via GPO (Enterprise only)"      
+        write-host "G4 - Mouse acceleration fix (100% DPI only)"
+        write-host "G5 - Disable StickyKeys and stuff"               
+        write-host "G6 - Enable God Mode (places a shortcut on Desktop)"    
+        write-host "G7 - Install fancy Sysinternals Utilities"    
+        write-host "G8 - Restore old volume slider" 
+        write-host "" 
+        write-host "Windows 10 fixer scripts"    
+        write-host "F1 - Repair Windows Image (slow)"
+        write-host "F2 - Gather extended log files from DISM"
+        write-host "F3 - Re-register ALL Windows Store Apps"
+        write-host "F4 - Reset Windows Store Cache"
+        write-host "F5 - Verify driver file signatures"       
+        write-host "F6 - Sync system time with Internet"        
+        write-host "F7 - Reset system services"       
+        write-host "F8 - Reset networking IP and flush DNS"                       
         write-host ""
         write-host ""
         write-host "Q - Help"
@@ -38,12 +48,12 @@ do {
         
         write-host ""
         
-        $ok = @("A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","X") -contains $choice
+        $ok = @("G1","G2","G3","G4","G5","G6","G7","G8","F1","F2","F3","F4","F5","F5","F6","F7","F9","Q", "X") -contains $choice
         if ( -not $ok) { write-host "Invalid selection" }
     } until ( $ok )
     
     switch -Regex ( $choice ) {
-        "A"
+        "G1"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Enabling Explorer to show hidden files, extensions and empty drives"      
@@ -53,7 +63,7 @@ do {
             write-host "Done!"  
         }
         
-        "B"
+        "F1"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Repairing a Windows Image and scanning for corrupted files."
@@ -63,7 +73,7 @@ do {
             write-host "Done!"  
         }
 
-        "C"
+        "F3"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Re-registering all Windows Store Apps'"
@@ -73,7 +83,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"  
         }
         
-        "D"
+        "F4"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Resetting Windows Store Cache'"
@@ -81,7 +91,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"  
         }
         
-        "E"
+        "F5"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "File Signature Verification started."           
@@ -89,17 +99,21 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"  
         }
 
-        "F"
+        "F7"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Resetting your networking IP address"
             ipconfig /release
             ipconfig /renew
             ipconfig /flushdns
+            $hostname = $env:COMPUTERNAME
+            $hostip = Get-NetIPAddress | Format-Table
+            write-host $hostname 
+            Write-Output $hostip   
             write-host "Done!"  
         }
         
-        "G"
+        "F2"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Gathering log files"
@@ -109,7 +123,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"  
         }
         
-        "H"
+        "G7"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Installing Sysinternals Utilities to C:\Sysinternals"
@@ -122,7 +136,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"  
         }
         
-        "I"
+        "G2"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Adding telemetry domains to Hosts file"
@@ -214,7 +228,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"
         }
         
-        "J"
+        "G3"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Disabling telemetry via Group Policies"
@@ -224,7 +238,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"
         }
         
-        "K"
+        "G4"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Apply MarkC's mouse acceleration fix"
@@ -243,7 +257,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"            
         }   
                 
-        "L"
+        "G5"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Disable easy access keyboard stuff"
@@ -253,7 +267,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"
         }   
         
-        "M"
+        "G6"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "God Mode has been enabled, check out the new link on your Desktop"            
@@ -261,7 +275,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"
         }    
         
-        "N"
+        "F7"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Forcing a time resynchronization"    
@@ -271,7 +285,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"
         }
         
-        "O"
+        "F8"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Resetting system services" 
@@ -287,7 +301,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"
         }
         
-        "P"
+        "G8"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Restoring old volume slider" 
@@ -300,24 +314,8 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Manual for this script"
-            write-host ""  
-            write-host "A - Explorer: enables showing of hidden files, extensions and empty drives"
-            write-host "B - Repair Windows Image. Use this if Windows is not acting normally. This will take some time."
-            write-host "C - Re-register ALL Windows Store Apps. This should fix downloading application update problems."
-            write-host "D - Reset Windows Store Cache. In case option C did not help"
-            write-host "E - Verify driver file signatures. In X64 all drivers must be signed properly."            
-            write-host "F - Reset networking IP and flush DNS. It will fix 99% of network problems faster than Diagnostics tool"
-            write-host "G - Gather extended log files from DISM. Then use those logs in forum to ask for help."
-            write-host "H - Install fancy Sysinternals Utilities. These will help you a lot if you are a 'power user'"
-            write-host "I - Block telemetry via Windows Firewall & Hosts file. Not guranteed 100% to work but better than nothing."       
-            write-host "J - Block telemetry via GPO (Enterprise only). If you have Enterprise, you can use it for additional blocking."      
-            write-host "K - Mouse acceleration fix (100% DPI only). Sadly not working with other DPI settings."
-            write-host "L - Disable StickyKeys and stuff. No more any of that"               
-            write-host "M - Enable God Mode (places a shortcut on Desktop). More of a gimmic if you ask me."     
-            write-host "N - Sync system time with Internet. No.1 problem why you don't have internet at Store app."        
-            write-host "O - Reset system services. This will make shure that services are working as needed."         
-            write-host "P - Restore old volume slider. For those who crave for easier access to volume mixer"    
-            write-host "" 
+            write-host ""            
+            write-host "This tool is a good start to understanding powershell scripting. " 
             
         }
     }
