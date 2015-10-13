@@ -28,6 +28,7 @@ do {
         write-host "G7 - Install fancy Sysinternals Utilities"    
         write-host "G8 - Restore old volume slider" 
         write-host "G9 - Remove default Windows apps"
+        write-host "G10 - Enable Dark theme (this is not final)"
         write-host "" 
         write-host "Windows 10 fixer scripts"    
         write-host "F1 - Repair Windows Image (slow)"
@@ -49,11 +50,19 @@ do {
         
         write-host ""
         
-        $ok = @("G1","G2","G3","G4","G5","G6","G7","G8","G9","F1","F2","F3","F4","F5","F5","F6","F7","F9","Q", "X") -contains $choice
+        $ok = @("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10","F1","F2","F3","F4","F5","F5","F6","F7","F9","Q", "X") -contains $choice
         if ( -not $ok) { write-host "Invalid selection" }
     } until ( $ok )
     
     switch -Regex ( $choice ) {
+        "G10"
+        {
+            Get-Variable true | Out-Default; Clear-Host;
+            write-host "Enabling dark theme"      
+            sp "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme" 0
+            sp "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme" 0
+            write-host "Done!"  
+        }
         "G1"
         {
             Get-Variable true | Out-Default; Clear-Host;
@@ -63,7 +72,6 @@ do {
             sp "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" "HideDrivesWithNoMedia" 0
             write-host "Done!"  
         }
-        
         "F1"
         {
             Get-Variable true | Out-Default; Clear-Host;
