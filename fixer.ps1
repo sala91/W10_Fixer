@@ -1,22 +1,46 @@
+# Making shure we have administrative rights
 If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
 {   
-$arguments = "& '" + $myinvocation.mycommand.definition + "'"
-Start-Process powershell -Verb runAs -ArgumentList $arguments
-Break
+    $arguments = "& '" + $myinvocation.mycommand.definition + "'"
+    Start-Process powershell -Verb runAs -ArgumentList $arguments
+    Break
 }
 
+# Making shure that our console window is readable
+[console]::backgroundcolor = "darkmagenta"
+[console]::foregroundcolor = "darkyellow"
+$p = $host.privatedata
+$p.ErrorForegroundColor    = "Red"
+$p.ErrorBackgroundColor    = "Black"
+$p.WarningForegroundColor  = "Yellow"
+$p.WarningBackgroundColor  = "Black"
+$p.DebugForegroundColor    = "Yellow"
+$p.DebugBackgroundColor    = "Black"
+$p.VerboseForegroundColor  = "Yellow"
+$p.VerboseBackgroundColor  = "Black"
+$p.ProgressForegroundColor = "Yellow"
+$p.ProgressBackgroundColor = "DarkCyan"
+
+# clear screen
+clear-host
+
+# fancy select screen with options
 do {
     do {
 
         $os = Get-WmiObject win32_operatingsystem
         $uptime = (Get-Date) - ($os.ConvertToDateTime($os.lastbootuptime))
-        $Display = "System uptime: " + $Uptime.Days + " days, " + $Uptime.Hours + " hours, " + $Uptime.Minutes + " minutes" 
+        $Display = "Uptime: " + $Uptime.Days + " days, " + $Uptime.Hours + " hours, " + $Uptime.Minutes + " minutes" 
         $uptimeBuild = (Get-ItemProperty -Path c:\windows\system32\hal.dll).VersionInfo.FileVersion
         $uptimeOsName = gwmi win32_operatingsystem | % caption  
         write-host ""
+            
+            
         write-host "BattleIT Group LTD 2015, v0.3"
-        write-host "System OS:" $uptimeOsName $uptimeBuild
+        write-host "-----------------------------"
+        write-host "OS:" $uptimeOsName $uptimeBuild
         Write-Output $Display
+        write-host "-----------------------------"
         write-host "" 
         write-host "Windows 10 goodies"
         write-host "G1 - Explorer: show hidden files, extensions and empty drives"
@@ -28,7 +52,8 @@ do {
         write-host "G7 - Install fancy Sysinternals Utilities"    
         write-host "G8 - Restore old volume slider" 
         write-host "G9 - Remove default Windows apps"
-        write-host "G10 - Enable Dark theme (this is not final)"
+        write-host "T1 - Enable Dark theme (incomplete)"
+        write-host "T2 - Enable Light theme (complete)"
         write-host "" 
         write-host "Windows 10 fixer scripts"    
         write-host "F1 - Repair Windows Image (slow)"
@@ -38,10 +63,11 @@ do {
         write-host "F5 - Verify driver file signatures"       
         write-host "F6 - Sync system time with Internet"        
         write-host "F7 - Reset system services"       
-        write-host "F8 - Reset networking IP and flush DNS"                       
+        write-host "F8 - Reset networking IP and flush DNS"      
+        write-host "F9 - Remove invalid shortcuts from Start menu"                     
         write-host ""
         write-host ""
-        write-host "Q - Help"
+        write-host "Q - Get me an excuse"
         write-host "X - Exit"
         write-host ""
         write-host -nonewline "Type your choice and press Enter: "
@@ -50,17 +76,53 @@ do {
         
         write-host ""
         
-        $ok = @("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10","F1","F2","F3","F4","F5","F5","F6","F7","F9","Q", "X") -contains $choice
+        $ok = @("G1","G2","G3","G4","G5","G6","G7","G8","G9","T1","T2","F1","F2","F3","F4","F5","F5","F6","F7","F8","F9","Q", "X") -contains $choice
         if ( -not $ok) { write-host "Invalid selection" }
     } until ( $ok )
     
     switch -Regex ( $choice ) {
-        "G10"
+        "F9"
+        {
+            Get-Variable true | Out-Default; Clear-Host;
+            write-host "Removing invalid shortcuts from Start menu"      
+            $WshShell = New-Object -comObject WScript.Shell
+            $Files = Get-ChildItem -recurse -Path "C:\Users\$env:USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs" -Filter *.lnk
+            foreach ($File in $Files) {
+                $FilePath = $File.FullName
+                $Shortcut = $WshShell.CreateShortcut($FilePath)
+                $Target = $Shortcut.TargetPath
+                if (Test-Path -Path $Target) {
+                    Write-Output "Valid: $($File.BaseName)"
+                } else {
+                    Write-Output "Invalid: $($File.BaseName) removed."
+                    try {
+                    Remove-Item -Path $LnkFilePath
+                    Write-Output "Removed: $($File.BaseName) removed."
+                    } catch {
+                    Write-Output "ERROR: $($File.BaseName) not removed."
+                    }
+                }
+            }
+            write-host "Done!"  
+        }
+        "T1"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Enabling dark theme"      
-            sp "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme" 0
-            sp "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme" 0
+            If (-Not (Test-Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize)) {
+                New-Item -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes -Name Personalize | Out-Null
+            }
+            Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Type DWord -Value 0
+            Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Type DWord -Value 0
+
+            write-host "Done!"  
+        }
+        "T2"
+        {
+            Get-Variable true | Out-Default; Clear-Host;
+            write-host "Enabling light theme"      
+            Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Type DWord -Value 1
+            Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Type DWord -Value 1
             write-host "Done!"  
         }
         "G1"
@@ -148,6 +210,8 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
         "G2"
         {
             Get-Variable true | Out-Default; Clear-Host;
+            write-host "Disabling Advertising ID"
+            Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo -Name Enabled -Type DWord -Value 0
             write-host "Adding telemetry domains to Hosts file"
             $hosts_file = "$env:systemroot\System32\drivers\etc\hosts"
             $domains = @(
@@ -322,9 +386,8 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
         "Q"
         {
             Get-Variable true | Out-Default; Clear-Host;
-            write-host "Manual for this script"
-            write-host ""            
-            write-host "This tool is a good start to understanding powershell scripting. " 
+            Write-Output (Invoke-WebRequest http://pages.cs.wisc.edu/~ballard/bofh/excuses -OutVariable excuses).content.split([Environment]::NewLine)[(get-random $excuses.content.split([Environment]::NewLine).count)]
+        
             
         }
         "G9"
