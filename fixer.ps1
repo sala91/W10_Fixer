@@ -170,7 +170,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"  
         }
 
-        "F7"
+        "F8"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Resetting your networking IP address"
@@ -348,7 +348,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"
         }    
         
-        "F7"
+        "F6"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Forcing a time resynchronization"    
@@ -358,7 +358,7 @@ Get-AppXPackage -AllUsers |Where-Object {$_.InstallLocation -like "*SystemApps*"
             write-host "Done!"
         }
         
-        "F8"
+        "F7"
         {
             Get-Variable true | Out-Default; Clear-Host;
             write-host "Resetting system services" 
