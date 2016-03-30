@@ -9,3 +9,6 @@ RemoteSigned - Downloaded scripts must be signed by a trusted publisher before t
 Unrestricted - No restrictions; all Windows PowerShell scripts can be run.
 
 To allow execution of this script type "Set-ExecutionPolicy Unrestricted" and enter.
+
+# This is a fork of
+https://github.com/W4RH4WK/Debloat-Windows-10
